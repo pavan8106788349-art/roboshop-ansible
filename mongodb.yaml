@@ -3,6 +3,11 @@
   become: yes
 
   tasks:
+    - name: download mongodb gpg key
+      ansible.builtin.get_url:
+        url: https://www.mongodb.org/static/pgp/server-7.0.asc
+        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-mongodb
+
     - name: copy mongo repo
       ansible.builtin.copy:
         src: mongo.repo
