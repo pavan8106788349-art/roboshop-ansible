@@ -1,5 +1,5 @@
 - name: configure cart
-  hosts: catalogue
+  hosts: cart
   become: yes
 
   tasks:
@@ -21,8 +21,8 @@
 
     - name: delete app directory
       ansible.builtin.file:
-       path: /app
-       state: absent  
+        path: /app
+        state: absent  
 
     - name: create app directory
       ansible.builtin.file:
@@ -31,8 +31,8 @@
 
     - name: delete cart zip file
       ansible.builtin.file:
-       path: /tmp/cart.zip
-       state: absent    
+        path: /tmp/cart.zip
+        state: absent    
 
     - name: download cart
       ansible.builtin.get_url:
@@ -51,16 +51,15 @@
 
     - name: copy cart service
       ansible.builtin.copy:
-        src: catalogue.service
-        dest: /etc/systemd/system/catalogue.service
+        src: cart.service
+        dest: /etc/systemd/system/cart.service
 
     - name: daemon reload
-      ansible.builtin.systemd_service:
-      daemon_reload: true
+      ansible.builtin.systemd:
+        daemon_reload: yes
 
     - name: start cart 
       ansible.builtin.service:
         name: cart
         state: restarted
         enabled: yes
-        
