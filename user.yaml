@@ -55,7 +55,7 @@
         dest: /etc/systemd/system/user.service 
 
     - name: daemon reload
-      ansible.buildin.systemdservice:
+      ansible.buildin.systemd_service:
        daemon_reload: yes  
 
     - name: start user
