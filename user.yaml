@@ -56,7 +56,7 @@
 
     - name: daemon reload
       ansible.buildin.systemdservice:
-       daemon_reload: true    
+       daemon_reload: yes  
 
     - name: start user
       ansible.builtin.service:
