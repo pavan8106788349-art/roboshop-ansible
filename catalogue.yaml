@@ -76,6 +76,6 @@
         msg: "{{ catalogue_output.stdout }}"
 
     - name: load the products
-  ansible.builtin.shell: |
-    mongosh --host {{ MONGODB_HOST }} < /app/schema/catalogue.js
-  when: catalogue_output.stdout is defined and (catalogue_output.stdout | int) < 0
+      ansible.builtin.shell: |
+        mongosh --host {{ MONGODB_HOST }} < /app/schema/catalogue.js
+      when: catalogue_output.stdout is defined and (catalogue_output.stdout | int) < 0
