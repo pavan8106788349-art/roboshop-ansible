@@ -54,6 +54,13 @@
         name: mongodb-mongosh
         state: present
 
+    - name: wait for mongodb port
+      ansible.builtin.wait_for:
+        host: "{{ MONGODB_HOST }}"
+        port: 27017
+        delay: 5
+        timeout: 60
+
     - name: check catalogue DB
       ansible.builtin.shell: |
         mongosh --host {{ MONGODB_HOST }} --quiet \
@@ -71,4 +78,4 @@
     - name: load the products
       ansible.builtin.shell: |
         mongosh --host {{ MONGODB_HOST }} < /app/schema/catalogue.js
-      when: catalogue_output.stdout is defined and (catalogue_output.stdout | int) < 0
+      when: catalogue_output.rc != 0
