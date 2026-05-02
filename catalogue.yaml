@@ -80,8 +80,12 @@
         mongosh --host {{ MONGODB_HOST }} < /app/schema/catalogue.js
       when: catalogue_output.stdout is defined and (catalogue_output.stdout | int) < 0
 
+    - name: reload systemd
+       ansible.builtin.systemd:
+        daemon_reload: yes
+
     - name: start catalogue
       ansible.builtin.service:
-      name: catalogue
-      state: restarted
-      enabled: yes  
+        name: catalogue
+        state: started
+        enabled: yes
