@@ -81,8 +81,8 @@
       when: catalogue_output.stdout is defined and (catalogue_output.stdout | int) < 0
 
     - name: reload systemd
-       ansible.builtin.systemd:
-        daemon_reload: yes
+      ansible.builtin.systemd:
+       daemon_reload: yes
 
     - name: start catalogue
       ansible.builtin.service:
