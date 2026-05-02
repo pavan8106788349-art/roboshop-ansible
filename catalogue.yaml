@@ -56,8 +56,8 @@
 
     - name: check catalogue DB
       ansible.builtin.shell: |
-      mongosh --host {{ MONGODB_HOST }} --quiet \
-      --eval 'db.getMongo().getDBNames().indexOf("catalogue")'
+        mongosh --host {{ MONGODB_HOST }} --quiet \
+        --eval 'db.getMongo().getDBNames().indexOf("catalogue")'
       register: catalogue_output
       retries: 5
       delay: 10
@@ -66,9 +66,9 @@
 
     - name: print the output
       ansible.builtin.debug:
-      msg: "{{ catalogue_output.stdout }}"
+        msg: "{{ catalogue_output.stdout }}"
 
     - name: load the products
       ansible.builtin.shell: |
-      mongosh --host {{ MONGODB_HOST }} < /app/schema/catalogue.js
+        mongosh --host {{ MONGODB_HOST }} < /app/schema/catalogue.js
       when: catalogue_output.stdout is defined and (catalogue_output.stdout | int) < 0
