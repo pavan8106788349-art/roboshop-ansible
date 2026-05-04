@@ -3,28 +3,26 @@
   become: yes
 
   tasks:
-    - name: copy rabbitmq repo file
-      ansible.builtin.copy:
-        src: rabbitmq.repo
-        dest: /etc/yum.repos.d/rabbitmq.repo
-
-    - name: install rabbitmq server
+    - name: install rabbitmq + erlang
       ansible.builtin.dnf:
-        name: rabbitmq-server
+        name:
+          - https://packagecloud.io/rabbitmq/erlang/packages/el/8/erlang-25.3.2-1.el8.x86_64.rpm
+          - https://packagecloud.io/rabbitmq/rabbitmq-server/packages/el/8/noarch/rabbitmq-server-3.12.9-1.el8.noarch.rpm
         state: present
+        disable_gpg_check: yes
 
-    - name: enable rabbitmq management plugin
+    - name: enable management plugin
       ansible.builtin.command: rabbitmq-plugins enable rabbitmq_management
 
-    - name: start and enable rabbitmq
+    - name: start rabbitmq
       ansible.builtin.service:
         name: rabbitmq-server
         state: started
         enabled: yes
 
-    - name: create rabbitmq user
-      community.rabbitmq.rabbitmq_user:
-        user: roboshop
-        password: RoboShop@1
-        state: present
-        tags: administrator
+    - name: create user
+      ansible.builtin.command: rabbitmqctl add_user roboshop RoboShop@1
+      ignore_errors: yes
+
+    - name: set permissions
+      ansible.builtin.command: rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"
