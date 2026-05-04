@@ -3,13 +3,21 @@
   become: yes
 
   tasks:
-    - name: install rabbitmq + erlang
+    - name: install dependencies
       ansible.builtin.dnf:
         name:
-          - https://packagecloud.io/rabbitmq/erlang/packages/el/8/erlang-25.3.2-1.el8.x86_64.rpm
-          - https://packagecloud.io/rabbitmq/rabbitmq-server/packages/el/8/noarch/rabbitmq-server-3.12.9-1.el8.noarch.rpm
+          - curl
+          - socat
+          - logrotate
         state: present
-        disable_gpg_check: yes
+
+    - name: install erlang repo
+      ansible.builtin.shell: |
+        dnf install -y https://packagecloud.io/rabbitmq/erlang/packages/el/8/erlang-26.2.5-1.el8.x86_64.rpm
+
+    - name: install rabbitmq server rpm
+      ansible.builtin.shell: |
+        dnf install -y https://packagecloud.io/rabbitmq/rabbitmq-server/packages/el/8/noarch/rabbitmq-server-3.12.12-1.el8.noarch.rpm
 
     - name: enable management plugin
       ansible.builtin.command: rabbitmq-plugins enable rabbitmq_management
