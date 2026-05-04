@@ -3,21 +3,14 @@
   become: yes
 
   tasks:
-    - name: install dependencies
+    - name: install repo
+      ansible.builtin.shell: |
+        curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh | bash
+
+    - name: install rabbitmq server
       ansible.builtin.dnf:
-        name:
-          - curl
-          - socat
-          - logrotate
+        name: rabbitmq-server
         state: present
-
-    - name: install erlang repo
-      ansible.builtin.shell: |
-        dnf install -y https://packagecloud.io/rabbitmq/erlang/packages/el/8/erlang-26.2.5-1.el8.x86_64.rpm
-
-    - name: install rabbitmq server rpm
-      ansible.builtin.shell: |
-        dnf install -y https://packagecloud.io/rabbitmq/rabbitmq-server/packages/el/8/noarch/rabbitmq-server-3.12.12-1.el8.noarch.rpm
 
     - name: enable management plugin
       ansible.builtin.command: rabbitmq-plugins enable rabbitmq_management
@@ -28,7 +21,7 @@
         state: started
         enabled: yes
 
-    - name: create user
+    - name: add user
       ansible.builtin.command: rabbitmqctl add_user roboshop RoboShop@1
       ignore_errors: yes
 
