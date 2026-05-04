@@ -11,7 +11,6 @@
     task_action: create
 
   tasks:
-
     - name: create ec2 instances
       amazon.aws.ec2_instance:
         name: "{{ item }}-{{ env }}"
