@@ -1,22 +1,22 @@
-# ansible-playbook -i localhost,   -e '{"instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"]}' roboshop.yaml
+# ansible-playbook -i localhost,   -e '{"instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"]}'  -e action=destroy roboshop.yaml
 - name: create ec2 and r53 records
-  hosts: localhost
+  hosts: all
   connection: local
-
   vars:
     sg_id: sg-0151d436ba995ac46
     ami_id: ami-0220d79f3f480ecf5
     domain_name: daws88s.space
     env: dev
-    task_action: "{{ action }}"
-
+    action: create
+    instances:
+    - mongodb
+    - catalogue
   tasks:
-
+  ### CREATE ###
   - name: create ec2 instance
     amazon.aws.ec2_instance:
       instance_type: "t3.micro"
-      vpc_security_group_ids:
-        - "{{ sg_id }}"
+      security_group: "{{ sg_id }}"
       image_id: "{{ ami_id }}"
       name: "{{ item }}-{{ env }}"
       tags:
@@ -26,68 +26,37 @@
         Name: "{{ item }}-{{ env }}"
     loop: "{{ instances }}"
     register: ec2_output
-    when: task_action == "create"
+    when: action == "create"
 
   - name: print the output
-    debug:
-      var: ec2_output
-    when: task_action == "create"
+    ansible.builtin.debug:
+      msg: "{{ ec2_output }}"
+    when: action == "create"
 
   - name: create r53 records
     amazon.aws.route53:
       state: present
       zone: "{{ domain_name }}"
-      record: "{{ item.item }}-{{ env }}.{{ domain_name }}"
+      record: "{{ item.item }}-{{ env }}.{{ domain_name }}" # mongodb-dev.daws88s.space, frontend-dev.daws88s.space
       type: A
       ttl: 1
       value: "{{ item.instances[0].private_ip_address }}"
+      wait: false
       overwrite: true
-    loop: "{{ ec2_output.results | default([]) }}"
-    when:
-      - task_action == "create"
-      - ec2_output is defined
+    loop: "{{ ec2_output.results }}" # list
+    when: action == "create"
 
   - name: create r53 record for frontend
     amazon.aws.route53:
       state: present
       zone: "{{ domain_name }}"
-      record: "roboshop-{{ env }}.{{ domain_name }}"
+      record: "roboshop-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.space
       type: A
       ttl: 1
       value: "{{ item.instances[0].public_ip_address }}"
-      overwrite: true
-    loop: "{{ ec2_output.results | default([]) }}"
-    when:
-      - item.item == "frontend"
-      - task_action == "create"
-
-       ### DESTROY ###
-  - name: delete r53 records for frontend
-    amazon.aws.route53:
-      state: absent
-      zone: "{{ domain_name }}"
-      record: "roboshop-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.online
-      type: A
-      ttl: 1
-    loop: "{{ instances }}"
-    when:  # and
-    - item == "frontend"
-    - action == "destroy"
-
-  - name: delete r53 records
-    amazon.aws.route53:
-      state: absent
-      zone: "{{ domain_name }}"
-      record: "{{ item }}-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.online
-      type: A
-      ttl: 1
-    loop: "{{ instances }}"
-    when: action == "destroy"
-
-  - name: delete ec2 instance
-    amazon.aws.ec2_instance:
-      state: absent
-      name: "{{ item }}-{{ env }}"
       wait: false
-    loop: "{{ instances }}"
-    when: action == "destroy"
+      overwrite: true
+    loop: "{{ ec2_output.results }}"
+    when:  # and
+    - item.item == "frontend"
+    - action == "create"
