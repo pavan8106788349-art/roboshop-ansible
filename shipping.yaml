@@ -47,9 +47,9 @@
         chdir: /app
 
     - name: copy service file
-      ansible.builtin.copy:
-        src: files/shipping.service
-        dest: /etc/systemd/system/shipping.service
+  ansible.builtin.template:
+    src: shipping.service
+    dest: /etc/systemd/system/shipping.service
 
     - name: daemon reload
       ansible.builtin.systemd:
