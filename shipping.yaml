@@ -40,16 +40,15 @@
       ansible.builtin.command: mvn clean package
       args:
         chdir: /app
-
     - name: rename jar
       ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
       args:
         chdir: /app
 
     - name: copy service file
-  ansible.builtin.template:
-    src: shipping.service
-    dest: /etc/systemd/system/shipping.service
+      ansible.builtin.template:
+        src: shipping.service
+        dest: /etc/systemd/system/shipping.service
 
     - name: daemon reload
       ansible.builtin.systemd:
