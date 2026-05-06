@@ -1,11 +1,11 @@
-# ansible-playbook -i localhost,   -e '{"instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"]}'  -e action=destroy roboshop.yaml
+# ansible-playbook -i localhost,   -e '{"instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"]}'  roboshop.yaml
 - name: create ec2 and r53 records
   hosts: localhost
   connection: local
   gather_facts: false
 
   vars:
-    image_id: ami-03265a0778a880afb
+    image_id: ami-0220d79f3f480ecf5
     instance_type: t2.micro
     security_group: sg-0eebe34cb6d5145f7
     zone: daws88s.space
