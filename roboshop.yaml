@@ -21,12 +21,12 @@
       wait: yes
     loop: "{{ instances }}"
     register: ec2_output
-    when: state == "present"
+    when: action == "create"
 
   - name: PRINT EC2 OUTPUT
     debug:
       msg: "{{ ec2_output }}"
-    when: state == "present"
+    when: action == "create"
 
   - name: CREATE Route53 records
     amazon.aws.route53:
@@ -37,7 +37,7 @@
       value: "{{ item.instances[0].private_ip_address }}"
       state: present
     loop: "{{ ec2_output.results }}"
-    when: state == "present"
+    when: action == "create"
 
      ### DESTROY ###
   - name: delete r53 records for frontend
