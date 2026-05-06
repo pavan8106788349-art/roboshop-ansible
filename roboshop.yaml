@@ -19,6 +19,7 @@
       instance_type: "{{ instance_type }}"
       security_group: "{{ security_group }}"
       wait: yes
+      state: present
     loop: "{{ instances }}"
     register: ec2_output
     when: action == "create"
@@ -39,33 +40,22 @@
     loop: "{{ ec2_output.results }}"
     when: action == "create"
 
-     ### DESTROY ###
-  - name: delete r53 records for frontend
-    amazon.aws.route53:
-      state: absent
-      zone: "{{ domain_name }}"
-      record: "roboshop-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.online
-      type: A
-      ttl: 1
-    loop: "{{ instances }}"
-    when:  # and
-    - item == "frontend"
-    - action == "destroy"
+  ### DESTROY ###
 
-  - name: delete r53 records
+  - name: DELETE Route53 records
     amazon.aws.route53:
       state: absent
-      zone: "{{ domain_name }}"
-      record: "{{ item }}-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.online
+      zone: "{{ zone }}"
+      record: "{{ item }}.{{ zone }}"
       type: A
       ttl: 1
     loop: "{{ instances }}"
     when: action == "destroy"
 
-  - name: delete ec2 instance
+  - name: DELETE EC2 instances
     amazon.aws.ec2_instance:
       state: absent
-      name: "{{ item }}-{{ env }}"
+      name: "{{ item }}"
       wait: false
     loop: "{{ instances }}"
     when: action == "destroy"
