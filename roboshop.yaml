@@ -38,21 +38,3 @@
       state: present
     loop: "{{ ec2_output.results }}"
     when: state == "present"
-
-  # ---------------- DESTROY ---------------- #
-
-  - name: TERMINATE EC2 instances
-    amazon.aws.ec2_instance:
-      name: "{{ item }}"
-      state: absent
-    loop: "{{ instances }}"
-    when: state == "absent"
-
-  - name: DELETE Route53 records
-    amazon.aws.route53:
-      zone: "{{ zone }}"
-      record: "{{ item }}.{{ zone }}"
-      type: A
-      state: absent
-    loop: "{{ instances }}"
-    when: state == "absent"
