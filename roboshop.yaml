@@ -4,7 +4,7 @@
   connection: local
 
   vars:
-    sg_id: sg-07ba13f991ed08116
+    sg_id: sg-0645b407538fba2b5
     ami_id: ami-0220d79f3f480ecf5
     env: dev
 
