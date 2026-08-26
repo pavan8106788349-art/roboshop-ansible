@@ -1,61 +1,31 @@
 # ansible-playbook -i localhost,   -e '{"instances":["mongodb","catalogue","redis","user","cart","mysql","shipping","rabbitmq","payment","frontend"]}'  roboshop.yaml
 - name: create ec2 and r53 records
-  hosts: localhost
+  hosts: all
   connection: local
-  gather_facts: false
-
   vars:
-    image_id: ami-0220d79f3f480ecf5
-    instance_type: t2.micro
-    security_group: sg-0851c429ccc91f149
-    zone: daws88s.space
-
+    sg_id: sg-07ba13f991ed08116
+    ami_id: ami-0220d79f3f480ecf5
+    environment: dev
+    instances:
+    - mongodb
+    - catalogue
   tasks:
-
-  - name: CREATE EC2 instances
+  - name: create ec2_instance
     amazon.aws.ec2_instance:
-      name: "{{ item }}"
-      image_id: "{{ image_id }}"
-      instance_type: "{{ instance_type }}"
-      security_group: "{{ security_group }}"
-      wait: yes
-      state: present
-    loop: "{{ instances }}"
+      instance_type: "t3.micro"
+      security_group: "{{ sg_id}}"
+      image_id: "{{ ami_id}}"
+      name: "{{ item }}-{{ environment }}"
+      tags:
+        Project: roboshop
+        component: {{ "item" }}
+        Environment: {{ "environment" }}
+        Name: "{{ item }}-{{ environment }}"
+    loop: "{{ instances }}"  
     register: ec2_output
-    when: action == "create"
 
-  - name: PRINT EC2 OUTPUT
-    debug:
-      msg: "{{ ec2_output }}"
-    when: action == "create"
+  - name: print the output
+    ansible.builtin.debug:
+      msg: "{{ ec2_output }}"   
 
-  - name: CREATE Route53 records
-    amazon.aws.route53:
-      zone: "{{ zone }}"
-      record: "{{ item.item }}.{{ zone }}"
-      type: A
-      ttl: 1
-      value: "{{ item.instances[0].private_ip_address }}"
-      state: present
-    loop: "{{ ec2_output.results }}"
-    when: action == "create"
-
-  ### DESTROY ###
-
-  - name: DELETE Route53 records
-    amazon.aws.route53:
-      state: absent
-      zone: "{{ zone }}"
-      record: "{{ item }}.{{ zone }}"
-      type: A
-      ttl: 1
-    loop: "{{ instances }}"
-    when: action == "destroy"
-
-  - name: DELETE EC2 instances
-    amazon.aws.ec2_instance:
-      state: absent
-      name: "{{ item }}"
-      wait: false
-    loop: "{{ instances }}"
-    when: action == "destroy"
+ 
