@@ -4,7 +4,7 @@
   connection: local
 
   vars:
-    sg_id: sg-0645b407538fba2b5
+    sg_id: sg-0dfb2894db668562b
     ami_id: ami-0220d79f3f480ecf5
     domain_name: daws88s.quest
     env: dev
@@ -57,5 +57,5 @@
         wait: true
       loop: "{{ ec2_output.results }}"
       when: item.item == "frontend"
-      
+
       
