@@ -3,7 +3,7 @@ Description=Cart Service
 
 [Service]
 User=roboshop
-Environment=REDIS_HOST=redis-dev.daws88s.space
+Environment=REDIS_HOST=redis-dev.daws88s.quest
 Environment=CATALOGUE_HOST={{ CATALOGUE_HOST }}
 Environment=CATALOGUE_PORT=8080
 ExecStart=/bin/node /app/server.js
