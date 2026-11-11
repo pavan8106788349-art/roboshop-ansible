@@ -1,47 +1,49 @@
-
 - name: create ec2 and r53 records
-  hosts: localhost
+  hosts: all
   connection: local
-
   vars:
     sg_id: sg-055a986a46696222d
     ami_id: ami-0055977a6e828a4f4
     domain_name: daws88s.quest
-    environment: dev
+    env: dev
+    action: create
     instances:
-      - mongodb
-      - catalogue
-
+    - mongodb
+    - catalogue
   tasks:
-    - name: create ec2 instance
-      amazon.aws.ec2_instance:
-        instance_type: t3.micro
-        security_group: "{{ sg_id }}"
-        image_id: "{{ ami_id }}"
-        name: "{{ item }}-{{ environment }}"
-        tags:
-          Project: roboshop
-          Component: "{{ item }}"
-          Environment: "{{ environment }}"
-          Name: "{{ item }}-{{ environment }}"
-      loop: "{{ instances }}"
-      register: ec2_output
+  ### CREATE ###
+  - name: create ec2 instance
+    amazon.aws.ec2_instance:
+      instance_type: "t3.micro"
+      security_group: "{{ sg_id }}"
+      image_id: "{{ ami_id }}"
+      name: "{{ item }}-{{ env }}"
+      tags:
+        Project: roboshop
+        Component: "{{ item }}"
+        Environment: "{{ env }}"
+        Name: "{{ item }}-{{ env }}"
+    loop: "{{ instances }}"
+    register: ec2_output
+    when: action == "create"
 
-    - name: print the output
-      ansible.builtin.debug:
-        msg: "{{ ec2_output }}"
+  - name: print the output
+    ansible.builtin.debug:
+      msg: "{{ ec2_output }}"
+    when: action == "create"
 
-   
-    - name: create r53 records
-      amazon.aws.route53:
-        state: present
-        zone: "{{ domain_name }}"
-        record: "{{ item.item }}-{{ environment }}.{{ domain_name }}"
-        type: A
-        ttl: 1
-        value: "{{ item.instances[0].private_ip_address }}"
-        wait: true
-      loop: "{{ ec2_output.results }}"
+  - name: create r53 records
+    amazon.aws.route53:
+      state: present
+      zone: "{{ domain_name }}"
+      record: "{{ item.item }}-{{ env }}.{{ domain_name }}" # mongodb-dev.daws88s.quest
+      type: A
+      ttl: 1
+      value: "{{ item.instances[0].private_ip_address }}"
+      wait: false
+      overwrite: true
+    loop: "{{ ec2_output.results }}" # list
+    when: action == "create"
  
 
 
