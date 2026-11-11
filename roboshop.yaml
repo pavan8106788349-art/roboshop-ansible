@@ -44,7 +44,6 @@
       overwrite: true
     loop: "{{ ec2_output.results }}" # list
     
- 
   - name: create r53 records
     amazon.aws.route53:
       state: present
@@ -57,6 +56,23 @@
       overwrite: true
     loop: "{{ ec2_output.results }}" # list
     when: item.item == "frontend"
+
+  - name: delete r53 records
+    amazon.aws.route53:
+      state: absent 
+      zone: "{{ domain_name }}"
+      record: "item-{{ env }}.{{ domain_name }}" # roboshop-dev.daws88s.quest
+      type: A
+      ttl: 1
+    loop: "{{ instances }}" 
+    when: action == "destroy"
+
+  - name: delete ec2 instance  
+    amazon.aws.ec2_instance:
+      state: absent
+      name: "{{ item }}-{{ env }}"
+    loop: "{{ instances }}"
+    when: action == "destroy" 
     
 
 
