@@ -1,19 +1,1 @@
-- name: configure mysql server
-  hosts: mysql
-  become: yes
 
-  tasks:
-    - name: install MYSQL server
-      ansible.builtin.dnf:
-        name: mysql-server
-        state: present
-
-    - name: start and enable mysql server
-      ansible.builtin.service:
-        name: mysqld
-        state: started
-        enabled: yes
-
-    - name: set root password
-      ansible.builtin.command: >
-        mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'RoboShop@1';"
