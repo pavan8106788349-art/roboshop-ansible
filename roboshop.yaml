@@ -3,7 +3,7 @@
   hosts: all
   connection: local
   vars:
-    sg_id: sg-01ab6d860b9bd912e
+    sg_id: sg-0a848622f1b132a1b
     ami_id: ami-0055977a6e828a4f4
     domain_name: daws88s.quest
     env: dev
