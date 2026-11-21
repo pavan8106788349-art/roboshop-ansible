@@ -4,7 +4,7 @@
   connection: local
 
   vars:
-    sg_id: sg-0a848622f1b132a1b
+    sg_id: sg-0b6274d623c1d28d7
     ami_id: ami-0055977a6e828a4f4
     domain_name: daws88s.quest
     env: dev
