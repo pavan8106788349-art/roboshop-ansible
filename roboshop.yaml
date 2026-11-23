@@ -4,7 +4,7 @@
   connection: local
 
   vars:
-    sg_id: sg-0b6274d623c1d28d7
+    sg_id: sg-07662e9a1d0615054
     ami_id: ami-0055977a6e828a4f4
     domain_name: daws88s.quest
     env: dev
@@ -74,32 +74,7 @@
         - action == "create"
         - item.item == "frontend"
 
-    ### DESTROY ###
-
-    - name: delete r53 record for frontend
-      amazon.aws.route53:
-        state: absent
-        zone: "{{ domain_name }}"
-        record: "roboshop-{{ env }}.{{ domain_name }}"
-        type: A
-      when: action == "destroy"
-
-    - name: delete r53 records
-      amazon.aws.route53:
-        state: absent
-        zone: "{{ domain_name }}"
-        record: "{{ item }}-{{ env }}.{{ domain_name }}"
-        type: A
-      loop: "{{ instances }}"
-      when: action == "destroy"
-
-    - name: delete ec2 instances
-      amazon.aws.ec2_instance:
-        state: absent
-        name: "{{ item }}-{{ env }}"
-        wait: false
-      loop: "{{ instances }}"
-      when: action == "destroy"
+  
 
 
   
